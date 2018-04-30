@@ -1,0 +1,117 @@
+//---------------------------------------------------------
+// CDL Generated based on pending OMG UML to CDL specification (0.3)
+// Source Model: Q:\BXS\EAI\Studio\Mall01\docs\Mall01.mdl
+// Generated CDL specification: Q:\BXS\EAI\Studio\Mall01\docs\Mall01.cdl
+// On 6/14/2000 
+//---------------------------------------------------------
+#include <BocaFramework.cdl>
+// Forward References
+// Logical View
+    module core {
+        type Address;
+        type Contact;
+        type DeliveryService;
+        type Shipping;
+        type Mall;
+        type Party;
+        type Payment;
+        type InvoiceLine;
+        type PurchaseOrderLine;
+        type Invoice;
+        type PurchaseOrder;
+        type Product;
+        type Customer;
+        type Vendor;
+    }; // End core
+//---------------------------------------------------------
+// Specification
+// Logical View
+    module core {
+        type Address {
+            attribute String streetAddress;
+            attribute String city;
+            attribute String postalCode;
+            attribute String State;
+            relationship party IsPartOf 1..1 Party inverse addresses ;
+            relationship shippings Many 0..* Shipping inverse address ;
+        }; // End: Address
+        type Contact {
+            attribute String firstName;
+            attribute String middleInitial;
+            attribute String lastName;
+            attribute String phone;
+            attribute String fax;
+            attribute String email;
+            relationship party IsPartOf 1..1 Party inverse contacts ;
+            relationship shippings Many 0..* Shipping inverse contact ;
+        }; // End: Contact
+        type DeliveryService {
+            relationship mall IsPartOf 1..1 Mall inverse deliveryServices ;
+            relationship shippings Many 0..* Shipping inverse deliveryService ;
+        }; // End: DeliveryService
+        type Shipping {
+            attribute double amount;
+            relationship deliveryService References 1..1 DeliveryService inverse shippings ;
+            relationship contact References 1..1 Contact inverse shippings ;
+            relationship address References 1..1 Address inverse shippings ;
+            relationship invoice IsPartOf 1..1 Invoice inverse shipping ;
+        }; // End: Shipping
+        type Mall {
+            relationship vendors Aggregates 0..* Vendor inverse mall ;
+            relationship deliveryServices Aggregates 0..* DeliveryService inverse mall ;
+            relationship parties Aggregates 0..* Party inverse mall ;
+        }; // End: Mall
+        type Party {
+            relationship mall IsPartOf 1..1 Mall inverse parties ;
+            relationship customers Many 0..* Customer inverse party ;
+            relationship contacts Aggregates 0..* Contact inverse party ;
+            relationship addresses Aggregates 0..* Address inverse party ;
+        }; // End: Party
+        type Payment {
+            attribute String amount;
+            relationship invoice IsPartOf 1..1 Invoice inverse payment ;
+        }; // End: Payment
+        type InvoiceLine {
+            relationship purchaseOrderLine References 1..1 PurchaseOrderLine inverse invoiceLine ;
+            relationship invoice IsPartOf 1..1 Invoice inverse invoiceLines ;
+        }; // End: InvoiceLine
+        type PurchaseOrderLine {
+            attribute double quantity;
+            attribute double unitPrice;
+            attribute double amount;
+            relationship purchaseOrder IsPartOf 1..1 PurchaseOrder inverse purchaseOrderLines ;
+            relationship product References 1..1 Product inverse purchaseOrderLines ;
+            relationship invoiceLine References 1..1 InvoiceLine inverse purchaseOrderLine ;
+        }; // End: PurchaseOrderLine
+        type Invoice {
+            attribute double amount;
+            attribute double taxes;
+            attribute double totalAmount;
+            relationship customer IsPartOf 1..1 Customer inverse invoices ;
+            relationship invoiceLines Aggregates 0..* InvoiceLine inverse invoice ;
+            relationship purchaseOrder References 1..1 PurchaseOrder inverse invoices ;
+            relationship payment Aggregates 1..1 Payment inverse invoice ;
+            relationship shipping Aggregates 0..1 Shipping inverse invoice ;
+        }; // End: Invoice
+        type PurchaseOrder {
+            relationship purchaseOrderLines Aggregates 0..* PurchaseOrderLine inverse purchaseOrder ;
+            relationship customer IsPartOf 1..1 Customer inverse purchaseOrders ;
+            relationship invoices Many 0..* Invoice inverse purchaseOrder ;
+        }; // End: PurchaseOrder
+        type Product {
+            attribute double unitPrice;
+            relationship vendor IsPartOf 1..1 Vendor inverse products ;
+            relationship purchaseOrderLines Many 0..* PurchaseOrderLine inverse product ;
+        }; // End: Product
+        type Customer {
+            relationship vendor IsPartOf 1..1 Vendor inverse customers ;
+            relationship purchaseOrders Aggregates 0..* PurchaseOrder inverse customer ;
+            relationship party References 1..1 Party inverse customers ;
+            relationship invoices Aggregates 0..* Invoice inverse customer ;
+        }; // End: Customer
+        type Vendor {
+            relationship products Aggregates 0..* Product inverse vendor ;
+            relationship customers Aggregates 0..* Customer inverse vendor ;
+            relationship mall IsPartOf 1..1 Mall inverse vendors ;
+        }; // End: Vendor
+    }; // End core
